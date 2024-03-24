@@ -1,38 +1,32 @@
 pipeline {
     agent any
-    stages {
-        stage("version of software"){
-            steps{
-                //sh "java --version"
-                bat "java --version"
-            }
-        }
-        stage("compile java program"){
-            steps{
-               // sh "javac Demo.java"
-                bat "mvn clean package"
-            }
-        }
-        
-         //stage('Test') {
-         //    steps {
-        //         sh 'echo "Fail!"; exit 1'
-        //     }
-        // }
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "MAVEN"
     }
-    post {
-        always {
-            echo 'This will always run'
-        }
-        success {
-            echo 'This will run only if successful'
-        }
-        failure {
-            echo 'This will run only if failed'
-        }
-        changed {
-            echo 'This will run only if the state of the Pipeline has changed'
-            echo 'Example : if the Pipeline was previously failing but is now successful'
+
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/jglick/simple-maven-project-with-tests.git'
+
+                // Run Maven on a Unix agent.
+               // sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+                // To run Maven on a Windows agent, use
+                 bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+
+            post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'target/*.jar'
+                }
+            }
         }
     }
 }
