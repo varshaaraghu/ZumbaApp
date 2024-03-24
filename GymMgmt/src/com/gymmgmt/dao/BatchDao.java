@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
 
 import com.gymmgmt.bean.Batch;
 import com.gymmgmt.resource.DbResource;
